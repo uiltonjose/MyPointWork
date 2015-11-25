@@ -1,6 +1,5 @@
 package com.ujps.mypointwork;
 
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -12,12 +11,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.ujps.mypointwork.util.PreferenceUtil;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView counterTextView;
-    public static final String MyPREFERENCES = "MyPrefs";
-    public static final String COUNTER_KEY = "counter";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,14 +30,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         counterTextView = (TextView) findViewById(R.id.counterView);
-        counterTextView.setText(String.valueOf(getSavedCounter()));
+        counterTextView.setText(String.valueOf(PreferenceUtil.getSavedCounter(MainActivity.this)));
 
         FloatingActionButton addMeal = (FloatingActionButton) findViewById(R.id.addMeal);
         addMeal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int value = getSavedCounter() + 1;
-                setCounterSharedPreference(value);
+                int value = PreferenceUtil.getSavedCounter(MainActivity.this) + 1;
+                PreferenceUtil.setCounterSharedPreference(MainActivity.this, value);
                 counterTextView.setText(String.valueOf(value));
                 Snackbar.make(view, "Refeição adicionada.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -52,13 +50,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                int savedCounter = getSavedCounter();
+                int savedCounter = PreferenceUtil.getSavedCounter(MainActivity.this);
                 if (savedCounter == 0) {
                     Snackbar.make(view, "Não é possível remover, você não possui nenhuma refeição.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
                     int newValue = --savedCounter;
-                    setCounterSharedPreference(newValue);
+                    PreferenceUtil.setCounterSharedPreference(MainActivity.this, newValue);
                     counterTextView.setText(String.valueOf(newValue));
                     Snackbar.make(view, "Refeição removida.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -88,17 +86,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private int getSavedCounter() {
-        SharedPreferences prefs = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
-        return prefs.getInt(COUNTER_KEY, 0);
-    }
-
-    private void setCounterSharedPreference(int counter) {
-
-        SharedPreferences.Editor editor = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE).edit();
-        editor.putInt(COUNTER_KEY, counter);
-        editor.commit();
     }
 }
